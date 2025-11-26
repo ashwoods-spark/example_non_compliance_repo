@@ -1,0 +1,20 @@
+FROM node:20-alpine
+
+RUN corepack enable && corepack prepare pnpm@8.15.0 --activate
+
+WORKDIR /app
+
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY apps/gateway/package.json ./apps/gateway/
+COPY packages/shared-types/package.json ./packages/shared-types/
+COPY packages/shared-config/package.json ./packages/shared-config/
+COPY packages/shared-db/package.json ./packages/shared-db/
+
+RUN pnpm install --frozen-lockfile
+
+COPY . .
+
+EXPOSE 8080
+
+CMD ["pnpm", "--filter", "@repo/gateway", "dev"]
+

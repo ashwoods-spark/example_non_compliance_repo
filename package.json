@@ -1,0 +1,35 @@
+{
+  "name": "au-benefits-legacy-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Australian government benefits platform demo implementing Social Security Act 1991 excerpt",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/example/au-benefits-legacy-demo"
+  },
+  "license": "MIT",
+  "packageManager": "pnpm@8.15.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "test:legislation": "ENABLE_LEGISLATION_TESTS=true pnpm -r test",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "clean": "pnpm -r clean && rm -rf node_modules",
+    "prisma:generate": "pnpm --filter @repo/shared-db prisma:generate",
+    "prisma:migrate": "pnpm --filter @repo/shared-db prisma:migrate",
+    "seed": "pnpm --filter @repo/scripts seed"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "prettier": "^3.2.4",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.1"
+  }
+}
+

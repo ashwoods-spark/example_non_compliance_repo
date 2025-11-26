@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Scan {
+  id          String    @id @default(cuid())
+  repoUrl     String
+  branch      String    @default("main")
+  status      String    // queued, running, completed, failed
+  startedAt   DateTime?
+  finishedAt  DateTime?
+  coveragePct Float?
+  createdAt   DateTime  @default(now())
+  
+  findings    Finding[]
+  reports     Report[]
+  
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Finding {
+  id             String   @id @default(cuid())
+  scanId         String
+  severity       String   // critical, high, medium, low, info
+  confidence     Int      // 0-100
+  lawSection     String
+  lawExcerpt     String   @db.Text
+  filePath       String
+  lineStart      Int
+  lineEnd        Int
+  rationale      String   @db.Text
+  recommendation String   @db.Text
+  createdAt      DateTime @default(now())
+  
+  scan           Scan     @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  
+  @@index([scanId])
+  @@index([severity])
+}
+
+model Ruleset {
+  id        String   @id @default(cuid())
+  name      String
+  source    String   // legislation, upload, manual
+  version   Int      @default(1)
+  status    String   // draft, active, archived
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  rules     Rule[]
+  
+  @@index([status])
+}
+
+model Rule {
+  id         String   @id @default(cuid())
+  rulesetId  String
+  sectionRef String
+  title      String
+  whenText   String   @db.Text
+  thenText   String   @db.Text
+  citations  String[] @default([])
+  
+  ruleset    Ruleset  @relation(fields: [rulesetId], references: [id], onDelete: Cascade)
+  
+  @@index([rulesetId])
+}
+
+model Upload {
+  id        String   @id @default(cuid())
+  fileName  String
+  mimeType  String
+  size      Int
+  status    String   // pending, processing, completed, failed
+  createdAt DateTime @default(now())
+  
+  @@index([status])
+}
+
+model Report {
+  id        String   @id @default(cuid())
+  scanId    String
+  type      String   // pdf, csv, json
+  url       String   @db.Text
+  createdAt DateTime @default(now())
+  
+  scan      Scan     @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  
+  @@index([scanId])
+}
+

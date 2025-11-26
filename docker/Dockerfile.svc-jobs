@@ -1,0 +1,17 @@
+FROM node:20-alpine
+
+RUN corepack enable && corepack prepare pnpm@8.15.0 --activate
+
+WORKDIR /app
+
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY services/svc-jobs/package.json ./services/svc-jobs/
+COPY packages/shared-config/package.json ./packages/shared-config/
+COPY packages/shared-db/package.json ./packages/shared-db/
+
+RUN pnpm install --frozen-lockfile
+
+COPY . .
+
+CMD ["pnpm", "--filter", "@repo/svc-jobs", "dev"]
+

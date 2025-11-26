@@ -1,0 +1,141 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: benefits_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  gateway:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.gateway
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: 8080
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/benefits_db
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: demo-secret-key-change-in-production
+      USE_LEGACY_ROUNDING: "true"
+      ENABLE_COMPLIANCE_ENGINE: "true"
+      SVC_ELIGIBILITY_URL: http://svc-eligibility:3001
+      SVC_BENEFITS_URL: http://svc-benefits:3002
+      SVC_COMPLIANCE_URL: http://svc-compliance:3003
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./apps/gateway:/app/apps/gateway
+      - ./packages:/app/packages
+      - ./legislation:/app/legislation
+    command: sh -c "pnpm --filter @repo/shared-db prisma:generate && pnpm --filter @repo/gateway dev"
+
+  svc-eligibility:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.svc-eligibility
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      NODE_ENV: development
+    volumes:
+      - ./services/svc-eligibility:/app/services/svc-eligibility
+      - ./packages:/app/packages
+    command: pnpm --filter @repo/svc-eligibility dev
+
+  svc-benefits:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.svc-benefits
+    ports:
+      - "3002:3002"
+    environment:
+      PORT: 3002
+      NODE_ENV: development
+    volumes:
+      - ./services/svc-benefits:/app/services/svc-benefits
+      - ./packages:/app/packages
+    command: pnpm --filter @repo/svc-benefits dev
+
+  svc-compliance:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.svc-compliance
+    ports:
+      - "3003:3003"
+    environment:
+      PORT: 3003
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/benefits_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./services/svc-compliance-engine:/app/services/svc-compliance-engine
+      - ./packages:/app/packages
+      - ./legislation:/app/legislation
+    command: sh -c "pnpm --filter @repo/shared-db prisma:generate && pnpm --filter @repo/svc-compliance-engine dev"
+
+  svc-jobs:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.svc-jobs
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/benefits_db
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./services/svc-jobs:/app/services/svc-jobs
+      - ./packages:/app/packages
+    command: sh -c "pnpm --filter @repo/shared-db prisma:generate && pnpm --filter @repo/svc-jobs dev"
+
+  web:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.web
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_BASE: http://localhost:8080/api
+    volumes:
+      - ./apps/web:/app/apps/web
+      - ./packages:/app/packages
+    command: pnpm --filter @repo/web dev
+
+volumes:
+  postgres_data:
+  redis_data:
+

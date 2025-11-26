@@ -1,0 +1,35 @@
+{
+  "repoUrl": "https://github.com/example/benefits-app",
+  "branch": "main",
+  "files": [
+    "src/eligibility/age.ts",
+    "src/eligibility/residency.ts",
+    "src/eligibility/index.ts",
+    "src/benefits/formula.ts",
+    "src/benefits/calculator.ts",
+    "src/benefits/rate.ts",
+    "src/config/thresholds.json",
+    "src/config/defaults.json",
+    "src/api/handlers/eligibility.ts",
+    "src/api/handlers/benefits.ts",
+    "src/api/handlers/summary.ts",
+    "src/api/routes.ts",
+    "src/utils/date.ts",
+    "src/utils/rounding.ts",
+    "src/utils/validation.ts",
+    "src/models/applicant.ts",
+    "src/models/benefit.ts",
+    "src/services/notification.ts",
+    "src/services/audit.ts",
+    "tests/eligibility.test.ts",
+    "tests/benefits.test.ts",
+    "README.md",
+    "package.json",
+    ".env.example"
+  ],
+  "metadata": {
+    "totalLines": 4532,
+    "language": "TypeScript"
+  }
+}
+
