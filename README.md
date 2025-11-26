@@ -1,6 +1,6 @@
 # AU Benefits Legacy Demo
 
-A demonstration Australian government benefits platform implementing an excerpt of the Social Security Act 1991 (SSA1991). This repository showcases a realistic legacy system with a microservices architecture, including eligibility checking, benefit calculations, compliance scanning, and a modern React frontend.
+A demonstration Australian defence compensation claims platform implementing an excerpt of the Safety, Rehabilitation and Compensation (Defence-related Claims) Act 1988 (DEFGLIS). This repository showcases a realistic legacy system with a microservices architecture, including eligibility checking, compensation calculations, compliance scanning, and a modern React frontend.
 
 ## 🏗️ Architecture
 
@@ -11,8 +11,8 @@ This is a **TypeScript monorepo** using **pnpm workspaces** with the following s
 
 ### Backend Services
 - **apps/gateway**: API Gateway (Fastify, JWT auth)
-- **services/svc-eligibility**: Age and residency eligibility checks
-- **services/svc-benefits**: Benefit calculations, income caps, rounding
+- **services/svc-eligibility**: Service period, duty status, and impairment checks
+- **services/svc-benefits**: Compensation calculations, medical cost approval
 - **services/svc-compliance-engine**: Legislative rule management
 - **services/svc-jobs**: Background jobs (BullMQ/Redis) for scan processing
 
@@ -29,14 +29,16 @@ This is a **TypeScript monorepo** using **pnpm workspaces** with the following s
 ## 📋 Legislation Artefacts
 
 The system implements requirements from:
-- `legislation/SSA1991_excerpt.md` - Human-readable summary
-- `legislation/SSA1991_rules.json` - Machine-readable ruleset (v2)
+- `legislation/DEFGLIS_excerpt.md` - Human-readable summary
+- `legislation/DEFGLIS_rules.json` - Machine-readable ruleset (v2)
 - `legislation/CHANGELOG.md` - Legislative amendments
 
 Key provisions:
-- **s.35(2)**: Senior rate threshold at age 65
-- **s.12(3)**: Minimum 10 months residency required
-- **s.40**: Income cap of $85,000 with benefit reduction formula
+- **s.14**: Eligibility for compensation (injury during service while on duty)
+- **s.19**: Minimum 90 days service for rehabilitation benefits
+- **s.24(1)**: Weekly compensation at 85% of normal weekly earnings
+- **s.27**: Medical treatment cap of $5,000 (prior approval required above)
+- **s.68**: Permanent impairment threshold of 10 points
 - **Rounding**: round-half-up to 2 decimal places
 
 ## 🚀 Quick Start
@@ -246,5 +248,5 @@ MIT
 
 ## ⚠️ Disclaimer
 
-This is a demonstration system for educational purposes. The legislative excerpts are simplified representations. For actual Social Security Act 1991 compliance, consult official Commonwealth legislation and legal experts.
+This is a demonstration system for educational purposes. The legislative excerpts are simplified representations. For actual DEFGLIS compliance, consult official Commonwealth legislation and legal experts specializing in defence compensation claims.
 

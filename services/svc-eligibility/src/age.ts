@@ -1,27 +1,22 @@
-// Age eligibility check
-// IMPLICIT MISMATCH: Using age >= 70 here, but legislation says 65
-// Historic note from 2019: retirement age was 67 for reference
+// On-duty status check for eligibility
+// Simple boolean check - member must have been on duty at time of injury
 
-export function isSeniorAge(age: number): boolean {
-  return age >= 70;
+export function wasOnDuty(onDuty: boolean): boolean {
+  return onDuty === true;
 }
 
-export function checkAgeEligibility(age: number): { eligible: boolean; reason?: string } {
-  if (age < 0) {
-    return { eligible: false, reason: 'Invalid age' };
+export function checkDutyStatus(onDuty: boolean, injuryDuringService: boolean): { 
+  eligible: boolean; 
+  reason?: string;
+} {
+  if (!injuryDuringService) {
+    return { eligible: false, reason: 'Injury not during service period' };
   }
   
-  const senior = isSeniorAge(age);
-  
-  if (!senior) {
-    return { eligible: false, reason: 'Age threshold not met' };
+  if (!wasOnDuty(onDuty)) {
+    return { eligible: false, reason: 'Member was not on duty at time of injury' };
   }
   
   return { eligible: true };
-}
-
-// Helper used in some UI tooltips (another mismatch - 68)
-export function getSeniorAgeHint(): number {
-  return 68;
 }
 

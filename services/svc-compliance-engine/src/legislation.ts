@@ -21,7 +21,7 @@ interface LegislationRules {
 
 export function loadLegislationRules(): LegislationRules {
   // Load from legislation directory
-  const rulesPath = path.resolve(process.cwd(), '../../legislation/SSA1991_rules.json');
+  const rulesPath = path.resolve(process.cwd(), '../../legislation/DEFGLIS_rules.json');
   
   if (!fs.existsSync(rulesPath)) {
     throw new Error(`Legislation rules not found at ${rulesPath}`);

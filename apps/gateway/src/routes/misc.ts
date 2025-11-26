@@ -71,7 +71,7 @@ export async function exportReport(
   return { url: dataUrl };
 }
 
-// IMPLICIT MISMATCH: This summary endpoint uses cap from defaults.json (92000)
+// IMPLICIT MISMATCH: This summary endpoint uses medicalCap from defaults.json (6500)
 export async function getSummaryStats(request: FastifyRequest, reply: FastifyReply) {
   const totalScans = await prisma.scan.count();
   const completedScans = await prisma.scan.count({
@@ -79,8 +79,8 @@ export async function getSummaryStats(request: FastifyRequest, reply: FastifyRep
   });
   const totalFindings = await prisma.finding.count();
   
-  // Using cap from gateway defaults (92k) - another source of truth
-  const configuredCap = defaultsConfig.cap;
+  // Using medical cap from gateway defaults (6500) - another source of truth
+  const configuredCap = defaultsConfig.medicalCap;
   
   return {
     totalScans,
@@ -88,7 +88,7 @@ export async function getSummaryStats(request: FastifyRequest, reply: FastifyRep
     totalFindings,
     environment: defaultsConfig.environment,
     region: defaultsConfig.region,
-    incomeCap: configuredCap, // 92000 - inconsistent with legislation (85k) and service config (90k)
+    medicalCostCap: configuredCap, // 6500 - inconsistent with legislation (5000) and service config (6000)
   };
 }
 

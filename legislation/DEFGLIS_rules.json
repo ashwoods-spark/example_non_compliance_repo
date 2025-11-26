@@ -1,0 +1,47 @@
+{
+  "name": "Safety, Rehabilitation and Compensation (Defence-related Claims) Act 1988 (Demo Excerpt)",
+  "shortName": "DEFGLIS Act 1988",
+  "version": 2,
+  "lastUpdated": "2024-07-01",
+  "jurisdiction": "Commonwealth of Australia",
+  "sections": [
+    {
+      "id": "DEFGLIS s.14",
+      "title": "Eligibility for compensation",
+      "when": "injury_during_service == true AND on_duty == true",
+      "then": "eligible: true",
+      "description": "Member must have sustained injury or disease during defence service while on duty"
+    },
+    {
+      "id": "DEFGLIS s.19",
+      "title": "Minimum service period",
+      "when": "service_days >= 90",
+      "then": "eligible_for_rehab: true",
+      "description": "Minimum 90 days continuous service required for rehabilitation benefits"
+    },
+    {
+      "id": "DEFGLIS s.24(1)",
+      "title": "Weekly compensation rate",
+      "when": "approved_claim == true",
+      "then": "weekly_compensation = normal_weekly_earnings * 0.85",
+      "description": "Weekly compensation calculated at 85% of normal weekly earnings"
+    },
+    {
+      "id": "DEFGLIS s.27",
+      "title": "Medical treatment cap",
+      "when": "medical_costs > 5000",
+      "then": "require_prior_approval: true",
+      "description": "Medical costs exceeding $5,000 require prior approval"
+    },
+    {
+      "id": "DEFGLIS s.68",
+      "title": "Permanent impairment threshold",
+      "when": "impairment_points >= 10",
+      "then": "eligible_for_lump_sum: true",
+      "description": "Permanent impairment compensation payable at 10+ impairment points"
+    }
+  ],
+  "rounding": "round-half-up(2)",
+  "currency": "AUD"
+}
+

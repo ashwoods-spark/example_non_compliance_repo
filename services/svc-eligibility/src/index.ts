@@ -1,36 +1,61 @@
 import Fastify from 'fastify';
-import { checkAgeEligibility } from './age.js';
-import { checkResidencyEligibility } from './residency.js';
-import { EligibilityCheckSchema, EligibilityResult } from '@repo/shared-types';
+import { checkDutyStatus } from './age.js';
+import { checkServiceEligibility } from './service.js';
+import { checkImpairmentEligibility } from './impairment.js';
+import { z } from 'zod';
 
 const fastify = Fastify({
   logger: true,
 });
 
+const ClaimEligibilitySchema = z.object({
+  serviceDays: z.number(),
+  onDuty: z.boolean(),
+  injuryDuringService: z.boolean(),
+  impairmentPoints: z.number().optional(),
+});
+
+const ClaimEligibilityResult = z.object({
+  eligible: z.boolean(),
+  serviceOk: z.boolean(),
+  dutyStatusOk: z.boolean(),
+  impairmentOk: z.boolean().optional(),
+  reasons: z.array(z.string()),
+});
+
 fastify.post<{ Body: unknown }>('/internal/eligibility/check', async (request, reply) => {
-  const result = EligibilityCheckSchema.safeParse(request.body);
+  const result = ClaimEligibilitySchema.safeParse(request.body);
   
   if (!result.success) {
     return reply.code(400).send({ error: 'Invalid request', details: result.error });
   }
   
-  const { age, residencyMonths } = result.data;
+  const { serviceDays, onDuty, injuryDuringService, impairmentPoints } = result.data;
   
-  const ageCheck = checkAgeEligibility(age);
-  const residencyCheck = checkResidencyEligibility(residencyMonths);
+  const serviceCheck = checkServiceEligibility(serviceDays);
+  const dutyCheck = checkDutyStatus(onDuty, injuryDuringService);
   
   const reasons: string[] = [];
-  if (!ageCheck.eligible && ageCheck.reason) {
-    reasons.push(ageCheck.reason);
+  if (!serviceCheck.eligible && serviceCheck.reason) {
+    reasons.push(serviceCheck.reason);
   }
-  if (!residencyCheck.eligible && residencyCheck.reason) {
-    reasons.push(residencyCheck.reason);
+  if (!dutyCheck.eligible && dutyCheck.reason) {
+    reasons.push(dutyCheck.reason);
   }
   
-  const response: EligibilityResult = {
-    eligible: ageCheck.eligible && residencyCheck.eligible,
-    isSenior: ageCheck.eligible,
-    residencyOk: residencyCheck.eligible,
+  let impairmentCheck = null;
+  if (impairmentPoints !== undefined) {
+    impairmentCheck = checkImpairmentEligibility(impairmentPoints);
+    if (!impairmentCheck.eligible && impairmentCheck.reason) {
+      reasons.push(impairmentCheck.reason);
+    }
+  }
+  
+  const response = {
+    eligible: serviceCheck.eligible && dutyCheck.eligible,
+    serviceOk: serviceCheck.eligible,
+    dutyStatusOk: dutyCheck.eligible,
+    impairmentOk: impairmentCheck?.eligible,
     reasons,
   };
   

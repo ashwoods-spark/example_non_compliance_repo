@@ -1,27 +1,41 @@
 import Fastify from 'fastify';
-import { calculateBenefit } from './formula.js';
-import { BenefitCalcSchema, BenefitResult } from '@repo/shared-types';
+import { calculateWeeklyCompensation, checkMedicalCostApproval } from './formula.js';
+import { z } from 'zod';
 
 const fastify = Fastify({
   logger: true,
 });
 
-fastify.post<{ Body: unknown }>('/internal/benefits/calc', async (request, reply) => {
-  const result = BenefitCalcSchema.safeParse(request.body);
+const CompensationCalcSchema = z.object({
+  normalWeeklyEarnings: z.number(),
+});
+
+const MedicalCostCheckSchema = z.object({
+  totalCost: z.number(),
+});
+
+fastify.post<{ Body: unknown }>('/internal/compensation/calc', async (request, reply) => {
+  const result = CompensationCalcSchema.safeParse(request.body);
   
   if (!result.success) {
     return reply.code(400).send({ error: 'Invalid request', details: result.error });
   }
   
-  const calcResult = calculateBenefit(result.data);
+  const calcResult = calculateWeeklyCompensation(result.data);
   
-  const response: BenefitResult = {
-    amount: calcResult.amount,
-    reduction: calcResult.reduction,
-    capped: calcResult.capped,
-  };
+  return calcResult;
+});
+
+fastify.post<{ Body: unknown }>('/internal/medical/check', async (request, reply) => {
+  const result = MedicalCostCheckSchema.safeParse(request.body);
   
-  return response;
+  if (!result.success) {
+    return reply.code(400).send({ error: 'Invalid request', details: result.error });
+  }
+  
+  const checkResult = checkMedicalCostApproval(result.data);
+  
+  return checkResult;
 });
 
 fastify.get('/health', async () => {

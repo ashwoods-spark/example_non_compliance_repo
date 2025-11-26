@@ -1,25 +1,25 @@
-# Social Security Act 1991 - Legislative Changes
+# DEFGLIS - Legislative Changes
 
 ## 2024-07-01
 
-**Gazette Notice C2024G00789**
+**Legislative Instrument F2024L00892**
 
-- **Section 40**: Prescribed amount for income test set to **AUD $85,000** (indexed annually)
+- **Section 27**: Medical treatment cap set to **AUD $5,000** per claim (previously $4,500)
+- **Section 24(1)**: Weekly compensation rate confirmed at **85%** of normal weekly earnings
 - **Calculation Standards**: All monetary calculations must use **round-half-up** methodology to **2 decimal places**
 
 ## 2023-09-15
 
-**Gazette Notice C2023G01234**
+**Legislative Instrument F2023L01234**
 
-- **Section 12(3)**: Residency requirement clarified - minimum **10 months** continuous Australian residency
+- **Section 19**: Minimum service period clarified - **90 days** continuous service required for rehabilitation benefits
 
 ## 2022-03-20
 
-**Gazette Notice C2022G00456**
+**Legislative Instrument F2022L00567**
 
-- **Section 35(2)**: Senior rate threshold confirmed at **age 65** (no change from previous determination)
+- **Section 68**: Permanent impairment threshold confirmed at **10 impairment points** (no change from previous determination)
 
 ---
 
 **Note**: This changelog reflects simulated legislative amendments for demonstration purposes.
-
